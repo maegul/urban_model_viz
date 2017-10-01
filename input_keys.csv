@@ -1,0 +1,15 @@
+input,key,desc
+Sporting_Facilities,Sport,Sporting Facilities
+Bus_Stops,Buses,Bus Stops
+Tram_Stops,Trams,Tram Stops
+Train_Stops,Trains,Train Stops
+Number_of_Intersections,Int’ns,Number of Intersections
+Commercial_Premesis,Comm,Commercial Premesis
+Cultural_Premises,Cult,Cultural Premises
+Health_Care_Settings,Health,Health Care Settings
+Agricultural_Land_Uses,Agric,Agricultural Land Uses
+Public_Buildings,Pblc Bds,Public Buildings
+Educational_Facilities,Edu,Educational Facilities
+Density_of_Dwellings,Dwell,Density of Dwellings
+Population_Density,Dens,Population Density
+Industrial_Premises,Ind,Industrial Premises

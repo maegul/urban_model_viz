@@ -1,0 +1,85 @@
+,input,group,mean,std
+0,Sporting_Facilities,Middle Suburbia,0.0,0.0
+1,Bus_Stops,Middle Suburbia,13.034,6.389
+2,Tram_Stops,Middle Suburbia,0.839,2.426
+3,Train_Stops,Middle Suburbia,0.108,0.356
+4,Number_of_Intersections,Middle Suburbia,44.222,13.898
+5,Commercial_Premesis,Middle Suburbia,0.042,0.204
+6,Cultural_Premises,Middle Suburbia,0.103,0.331
+7,Health_Care_Settings,Middle Suburbia,0.16,0.367
+8,Agricultural_Land_Uses,Middle Suburbia,1.957,1.344
+9,Public_Buildings,Middle Suburbia,0.45,0.819
+10,Educational_Facilities,Middle Suburbia,1.292,1.22
+11,Density_of_Dwellings,Middle Suburbia,12.63,4.515
+12,Population_Density,Middle Suburbia,31.956,10.474
+13,Industrial_Premises,Middle Suburbia,0.007,0.084
+14,Sporting_Facilities,Connected Inner ring,0.0,0.0
+15,Bus_Stops,Connected Inner ring,12.54,7.545
+16,Tram_Stops,Connected Inner ring,10.991,7.425
+17,Train_Stops,Connected Inner ring,0.398,0.665
+18,Number_of_Intersections,Connected Inner ring,70.511,36.472
+19,Commercial_Premesis,Connected Inner ring,0.199,0.498
+20,Cultural_Premises,Connected Inner ring,0.467,0.718
+21,Health_Care_Settings,Connected Inner ring,0.708,0.831
+22,Agricultural_Land_Uses,Connected Inner ring,2.733,1.908
+23,Public_Buildings,Connected Inner ring,1.106,1.24
+24,Educational_Facilities,Connected Inner ring,2.583,2.192
+25,Density_of_Dwellings,Connected Inner ring,27.236,16.324
+26,Population_Density,Connected Inner ring,54.699,26.665
+27,Industrial_Premises,Connected Inner ring,0.009,0.092
+28,Sporting_Facilities,Urban Fringe,0.0,0.0
+29,Bus_Stops,Urban Fringe,5.167,4.669
+30,Tram_Stops,Urban Fringe,0.091,0.757
+31,Train_Stops,Urban Fringe,0.033,0.197
+32,Number_of_Intersections,Urban Fringe,38.224,18.792
+33,Commercial_Premesis,Urban Fringe,0.008,0.089
+34,Cultural_Premises,Urban Fringe,0.022,0.151
+35,Health_Care_Settings,Urban Fringe,0.003,0.058
+36,Agricultural_Land_Uses,Urban Fringe,0.672,0.805
+37,Public_Buildings,Urban Fringe,0.12,0.419
+38,Educational_Facilities,Urban Fringe,0.219,0.484
+39,Density_of_Dwellings,Urban Fringe,7.519,5.262
+40,Population_Density,Urban Fringe,19.516,14.285
+41,Industrial_Premises,Urban Fringe,0.004,0.065
+42,Sporting_Facilities,Connected pockets,0.668,0.528
+43,Bus_Stops,Connected pockets,13.282,8.454
+44,Tram_Stops,Connected pockets,4.562,7.064
+45,Train_Stops,Connected pockets,0.62,0.703
+46,Number_of_Intersections,Connected pockets,54.252,27.448
+47,Commercial_Premesis,Connected pockets,0.078,0.276
+48,Cultural_Premises,Connected pockets,0.338,0.572
+49,Health_Care_Settings,Connected pockets,0.283,0.537
+50,Agricultural_Land_Uses,Connected pockets,2.963,1.789
+51,Public_Buildings,Connected pockets,0.938,1.182
+52,Educational_Facilities,Connected pockets,1.768,1.639
+53,Density_of_Dwellings,Connected pockets,16.091,10.676
+54,Population_Density,Connected pockets,35.553,21.163
+55,Industrial_Premises,Connected pockets,0.007,0.085
+56,Sporting_Facilities,High Density Inner City,0.311,0.465
+57,Bus_Stops,High Density Inner City,15.567,10.162
+58,Tram_Stops,High Density Inner City,21.947,12.856
+59,Train_Stops,High Density Inner City,0.758,0.83
+60,Number_of_Intersections,High Density Inner City,129.212,54.995
+61,Commercial_Premesis,High Density Inner City,3.386,7.989
+62,Cultural_Premises,High Density Inner City,1.962,1.485
+63,Health_Care_Settings,High Density Inner City,0.985,1.041
+64,Agricultural_Land_Uses,High Density Inner City,3.742,2.626
+65,Public_Buildings,High Density Inner City,2.25,2.043
+66,Educational_Facilities,High Density Inner City,4.439,3.925
+67,Density_of_Dwellings,High Density Inner City,51.845,59.79
+68,Population_Density,High Density Inner City,87.462,92.774
+69,Industrial_Premises,High Density Inner City,0.0,0.0
+70,Sporting_Facilities,User,0.046,0.218
+71,Bus_Stops,User,9.673,7.171
+72,Tram_Stops,User,1.635,4.679
+73,Train_Stops,User,0.135,0.409
+74,Number_of_Intersections,User,44.768,22.712
+75,Commercial_Premesis,User,0.062,0.718
+76,Cultural_Premises,User,0.122,0.409
+77,Health_Care_Settings,User,0.146,0.415
+78,Agricultural_Land_Uses,User,1.542,1.494
+79,Public_Buildings,User,0.4,0.839
+80,Educational_Facilities,User,0.979,1.397
+81,Density_of_Dwellings,User,11.985,10.318
+82,Population_Density,User,28.887,19.581
+83,Industrial_Premises,User,0.006,0.077
