@@ -257,7 +257,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 				.get('[0]mean')
 				.value();
 
-			var step_val = 0.1 * (input_base_range[iv][1] - input_base_range[iv][0])
+			// var step_val = 0.1 * (input_base_range[iv][1] - input_base_range[iv][0])
 
 			var iv_key = _.chain(inpt_keys)
 						.filter({input: iv})
@@ -290,7 +290,8 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 			$('#input_'+i).spinner( "option", { index_bind: i,
 												input_bind: iv, 
 												min: 0,
-												step: step_val 
+												step: 1
+												// step: step_val 
 												} );
 
 			$('#input_'+i).on('spin', function(event, ui){
@@ -780,15 +781,6 @@ function gen_p_coord_plot_input(output){
 		d3.select(this.parentNode)
 			.on('mouseover', function(){
 
-				d3.select('body').append('div').classed('label_hover', true)
-					.style('position', 'absolute')
-					.style('top', function(){
-						return (event.y-45) + 'px';
-					})
-					.style('right', function(){
-						return (screen.width - event.x) + 'px';
-					})
-					.text(desc);
 
 				d3.selectAll('.inpt_cont')
 					.filter(function(){
@@ -799,7 +791,6 @@ function gen_p_coord_plot_input(output){
 
 			})
 			.on('mouseout', function(){
-				d3.selectAll('.label_hover').remove();
 
 				d3.selectAll('.inpt_spin_lab')
 					.style('font-weight', 'initial')
@@ -914,23 +905,6 @@ function gen_p_coord_plot_proto(output){
 					.get('[0]desc')
 					.value()
 
-		d3.select(this)
-			.on('mouseover', function(){
-
-				d3.select('body').append('div').classed('label_hover', true)
-					.style('position', 'absolute')
-					.style('top', function(){
-						return (event.y-45) + 'px';
-					})
-					.style('right', function(){
-						return (screen.width - event.x) + 'px';
-					})
-
-					.text(desc);
-			})
-			.on('mouseout', function(){
-				d3.selectAll('.label_hover').remove();
-			})
 
 
 	})
