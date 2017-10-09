@@ -61,6 +61,11 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	// var cat_cols = d3.schemeDark2;
 
+	var uniMelb_cols = ['#d2f1cf', '#e5e1dc', '#e1eaf5', '#82a1bd', '#fffbcc'];
+
+
+	// Creates object for binding color set to the data set
+	// Pass in an array of colors as second argument to change color palette
 	var group_col_bind = gen_group_color_bind(input_groups, cat_cols);
 
 	console.log('group color bind', group_col_bind);
