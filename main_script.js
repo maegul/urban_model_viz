@@ -22,7 +22,22 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 // Sort Data
 
-	var data_sorted = _.sortBy(data, ['Land_Use_Element_Estimates']);
+	// Take out constants into separate object
+	var data_constants = _.chain(data)
+							.filter(d=>d['Land_Use_Element_Estimates'] == 'Constant')
+							.get(0)
+							.value()
+
+	// Sort by Land_Use... and filter out the Constants
+
+	// Purpose of sorting by Land_use... is so that the order of in vars and out vars lines up
+	// This is relied on in the gen_output_proto() function
+	// This presumes that the labelling of in vars is identical in loc_1_var and input_sets
+	// Below this is explictly checked
+	var data_sorted = _.chain(data)
+						.filter(d=>d['Land_Use_Element_Estimates'] != 'Constant')
+						.sortBy(['Land_Use_Element_Estimates'])
+						.value();
 
 
 	// Get variables
@@ -79,6 +94,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	console.log('sorted in var', in_vars_sorted);
 
 
+
 	// Check input vars in inputs match those of the model
 
 	input_fields_check = [];
@@ -94,8 +110,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 		var check;
 
-		// console.log(in_vars_sorted.join(',')) 
-		// console.log(input_fields.join(','))
+
 
 		if (in_vars_sorted.join(',') == input_fields.join(',')) {
 			check = 'passed';
@@ -103,7 +118,6 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 			check = 'failed';
 		}
 
-		// console.log(check);
 		input_fields_check.push(check);
 	})
 
@@ -111,13 +125,12 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	console.log('input fields check', input_fields_check);
 
 
-	// Calculate input var ranges for
-
-
 	// Get output variables from column headers, excluding the 'Land Use ...'
 	var out_vars = Object.keys(data[0]);
-	out_vars = out_vars.slice(1, out_vars.length);
-	out_vars_sorted = _.sortBy(out_vars);
+	out_vars_sorted = _.chain(out_vars)
+						.filter(ov=>ov != 'Land_Use_Element_Estimates')
+						.sortBy()
+						.value();
 
 
 	// Create object of factors for each output variable
@@ -125,27 +138,13 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	// For each out var, array of factors in order of in var
 	out_vars_sorted.forEach(function(ov){
-		loc_1[ov] = data.map(function(r){
+		loc_1[ov] = data_sorted.map(function(r){
 			return parseFloat(r[ov]);
 		})
 	})
 
 	console.log('loc_1')
 	console.log(loc_1)
-
-
-	var loc_1_proto = [];
-
-	out_vars_sorted.forEach(function(ov){
-
-		var out_var_factors = data_sorted.map(function(r){
-			return parseFloat(r[ov]);
-		})
-
-		loc_1_proto.push({out_var: ov, factors: out_var_factors})
-	})
-
-	console.log('proto loc', loc_1_proto)
 
 
 	// Base Axis ranges
@@ -631,37 +630,46 @@ function gen_input_dat(input){
 
 function gen_output_proto(input){
 
+
 	// array - object for each out_var - out_var; values(for each input); ids;
 
 	var output = [];
 
+	// Get array of unique groups
 	var groups = _.chain(input)
 					.map(i=>i.group)
 					.uniq()
 					.sortBy()
 					.value();
 
+
+
+	// Calculate each group separately - each is separate object
 	groups.forEach(function(g){
 
 		var output_d = {};
 
+		// Add group name to group object
 		output_d['name'] = g;
 
 
+		// Get input values for group
+		// Sorting input values so that line up with model order
+		// Get mean
 		var input_values = _.chain(input)
 							.filter(i=>i.group == g)
 							.sortBy(i=>i.input)
 							.map(i=>i.mean)
-							.value()								
+							.value()
+
 
 		out_vars_sorted.forEach(function(ov){
 
-			// Sorting input values so that line up with model order
 
 			var new_value = math
-					.chain(loc_1[ov].slice(0, loc_1[ov].length-1)) // Constant (last) isn't factor
+					.chain(loc_1[ov]) // Use the factors for output variable
 					.multiply(input_values) // Multiplies and sums products
-					.add(loc_1[ov][loc_1[ov].length-1]) // Add constant
+					.add(data_constants[ov]) // Add constant
 					.done()
 
 			output_d[ov] = new_value;
@@ -669,6 +677,7 @@ function gen_output_proto(input){
 
 		});
 
+		// Push group object to output array
 		output.push(output_d);
 
 	}) 
