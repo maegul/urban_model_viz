@@ -470,18 +470,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 			})
 	})
 
-	// sort_opts.forEach(function(l){
-	// 	sort_inpts.append('input')
-	// 		.attr('type', 'radio')
-	// 		.attr('name', 'out_sort')
-	// 		.attr('id', 'rad'+l)
-	// 	sort_inpts.append('label')
-	// 		.text(l)
-	// 		.attr('for', 'rad'+l)
 
-		// $('#rad'+l).checkboxradio();
-
-	// })
 
 
 
@@ -491,16 +480,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	update();
 
 	console.log('input dat', gen_input_dat(inputs))
-	// var output = gen_output();
-	// gen_plot(output);
 
-
-	// gen_p_coord_plot(output);
-
-
-
-	// // For preserving the arrangement of the dimensions
-	// var dim_order;
 
 
 
@@ -566,7 +546,6 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
 
-	// download_csv(gen_data_csv_array()[0], 'in_test')
 
 	d3.select('#download_input').on('click', function(){
 		download_csv(gen_input_data_csv_array(), 'input_data')
