@@ -193,6 +193,10 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	function set_user_group_dat(){
 
+		// Modifies inputs in place
+		// User becomes the selected group
+		// Relies on copying and get_group_input_dat to reset User to initial values when so selected
+
 		in_vars_sorted.forEach(function(iv){
 			_.filter(inputs, {input: iv, group: 'User'})[0]['mean'] = _.filter(group_input_dat, {input: iv})[0]['mean']
 		})
@@ -336,7 +340,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
 
-	// Set up Selector
+	// Set up Area Selector
 
 	var sel_cont = d3.select('#area_sel_cont');
 
@@ -500,11 +504,85 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
 
+	// Download CSVs
+
+	function gen_input_data_csv_array(){
+
+		
+		var current_data = update(true)
+		var current_in_data = current_data[0]
+		
+
+		var in_csv_head = _.keys(current_in_data[0]);
+		var in_arrays = [in_csv_head];
+
+		current_in_data.forEach(function(od, i){
+
+			var vals_array = []
+			in_csv_head.forEach(function(head){
+				vals_array.push(od[head])
+			})
+			in_arrays.push(vals_array)
+
+		})
+
+		return in_arrays;
+
+	}
+
+	function gen_output_data_csv_array(){
+
+		var current_data = update(true)
+		var current_out_data = current_data[1]
+		
+		var out_csv_head = _.keys(current_out_data[0]);
+		var out_arrays = [out_csv_head];
+
+		current_out_data.forEach(function(od, i){
+
+			var vals_array = []
+			out_csv_head.forEach(function(head){
+				vals_array.push(od[head])
+			})
+			out_arrays.push(vals_array)
+
+		})
+
+		return out_arrays
+	}
+
+	function download_csv(csv_arrays, file_name) {
+
+		var csvContent = csv_arrays.map(oa => oa.join(',')).join('\n')
+
+		var a = document.createElement('a');
+		a.href = 'data:attachment/csv,' +  encodeURIComponent(csvContent);
+		a.target = '_blank';
+		a.download = file_name+'.csv';
+
+		document.body.appendChild(a);
+		a.click();
+	}
+
+
+
+	// download_csv(gen_data_csv_array()[0], 'in_test')
+
+	d3.select('#download_input').on('click', function(){
+		download_csv(gen_input_data_csv_array(), 'input_data')
+	})
+
+	d3.select('#download_output').on('click', function(){
+		download_csv(gen_output_data_csv_array(), 'output_data')
+	})
+
+
+
 
 // Functions
 
 // Update Func
-function update(){
+function update(return_data){
 
 	// determine which groups to display
 	var selected_groups = gen_selected_groups();
@@ -524,6 +602,11 @@ function update(){
 	gen_p_coord_plot_input(input_dat);
 
 	d3.selectAll('.label').attr('text-anchor', 'left').attr('transform', 'rotate(-65)')
+
+	// For saving data, allow for output option
+	if (return_data) {
+		return [input_dat, output]
+	}
 }
 
 
@@ -670,6 +753,7 @@ function gen_output_proto(input){
 					.chain(loc_1[ov]) // Use the factors for output variable
 					.multiply(input_values) // Multiplies and sums products
 					.add(data_constants[ov]) // Add constant
+					.max(0) // Bottom out at zero, no negative values
 					.done()
 
 			output_d[ov] = new_value;
