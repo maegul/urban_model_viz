@@ -396,41 +396,48 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	// Sort Axes Numerically
 
+	var sorted_dims = gen_sorted_dims(base_output);
+
+	function gen_sorted_dims(output){
 
 
-	var dim_val_order = [];
+		var dim_val_order = [];
 
-	dims_keys_output.forEach(function(dk){
+		dims_keys_output.forEach(function(dk){
 
-	// Change base_output to current output to sort by current selection??
-		var out_name_val = _.chain(base_output)
-			.sortBy(o => o[dk])
-			.map(o => o.name)
-			.reverse() // First element is highest in value
-			.value();
+		// Change base_output to current output to sort by current selection??
+			var out_name_val = _.chain(output)
+				.sortBy(o => o[dk])
+				.map(o => o.name)
+				.reverse() // First element is highest in value
+				.value();
 
-		dim_val_order.push({dim: dk, ord: out_name_val})
-
-
-	})
+			dim_val_order.push({dim: dk, ord: out_name_val})
 
 
-	console.log('dim order', dim_val_order)
+		})
 
-	var dim_sort_key = d3.range(dim_val_order[0]['ord'].length).map(function(idx){
-									return '[ord][' + idx + ']'
-								})
 
-	var sorted_dims = _.chain(dim_val_order)
-						.sortBy(dim_sort_key)
-						.map(function(d, i){
-							return {dim: d.dim, index: i}
-						})
-						.value();
+		console.log('dim order', dim_val_order)
 
-	sorted_dims = _.zipObject(_.map(sorted_dims, 'dim'), _.map(sorted_dims, 'index'))
+		var dim_sort_key = d3.range(dim_val_order[0]['ord'].length).map(function(idx){
+										return '[ord][' + idx + ']'
+									})
 
-	console.log('sorted dims', sorted_dims)
+		var sorted_dims = _.chain(dim_val_order)
+							.sortBy(dim_sort_key)
+							.map(function(d, i){
+								return {dim: d.dim, index: i}
+							})
+							.value();
+
+		sorted_dims = _.zipObject(_.map(sorted_dims, 'dim'), _.map(sorted_dims, 'index'))
+
+		console.log('sorted dims', sorted_dims)
+
+		return sorted_dims;
+	}
+
 
 
 
@@ -446,7 +453,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	sort_inpts.append('div').text('Sort output by:')
 	var sort_sel_cont = sort_inpts.append('div');
 
-	var sort_opts = ['ABC', 'Grouped']
+	var sort_opts = ['ABC', 'Grouped', 'Current Selection Grouped']
 
 	sort_opts.forEach(function(l){
 		sort_sel_cont.append('button').classed('sel_butt', true)
@@ -461,6 +468,9 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 				// If user ordering has occurred ... re apply irrespective of whether selected or not
 				output_p_c_sort_param = d3.select(this).attr('sort_param');
+				
+
+
 				update();
 
 				if (sel == 0) {
@@ -584,6 +594,14 @@ function update(return_data){
 
 
 	var output = gen_output_proto(new_input);
+
+	if (output_p_c_sort_param == 'current selection grouped') {
+		current_sorted_dims = gen_sorted_dims(output)
+	}
+	// Store base sorted dims, then have modified version and modify and toggle back 
+	// when necessary
+
+
 	gen_p_coord_plot_proto(output);
 
 	var input_dat = gen_input_dat(new_input);
@@ -940,6 +958,10 @@ function gen_p_coord_plot_proto(output){
 		} else if (output_p_c_sort_param == 'grouped') {
 
 			var dim_index = sorted_dims[dk]
+
+		} else if (output_p_c_sort_param == 'current selection grouped') {
+
+			var dim_index = current_sorted_dims[dk]
 
 		} else if (output_p_c_sort_param == undefined) {
 			// Take previous index if sort param has been reset
