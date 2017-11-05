@@ -177,6 +177,11 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	var group_input_dat = get_group_input_dat();
 
+	var pc_plot_objs = {
+		output: undefined,
+		input: undefined
+	}
+
 	function get_group_input_dat(){
 		if (sel_group == 'User') {
 			var group_input_dat = _.cloneDeep(user_inputs_copy)
@@ -397,6 +402,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	dims_keys_output.forEach(function(dk){
 
+	// Change base_output to current output to sort by current selection??
 		var out_name_val = _.chain(base_output)
 			.sortBy(o => o[dk])
 			.map(o => o.name)
@@ -432,6 +438,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	// Add sorting buttons
 
 	//  Determines how output axes sorted
+	// Note ... can be reset to undefined to allow for user ordering to persist
 	var output_p_c_sort_param = 'abc'
 
 
@@ -452,6 +459,10 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 				var sel = d3.select(this).attr('sel')
 
+				// If user ordering has occurred ... re apply irrespective of whether selected or not
+				output_p_c_sort_param = d3.select(this).attr('sort_param');
+				update();
+
 				if (sel == 0) {
 
 					d3.select(this.parentNode).selectAll('button')
@@ -463,8 +474,6 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 						.style('opacity', 1)
 
 
-					output_p_c_sort_param = d3.select(this).attr('sort_param');
-					update();
 
 				}
 			})
@@ -924,15 +933,26 @@ function gen_p_coord_plot_proto(output){
 
 		var scale = d3.scale.linear().domain(extent).range([range, 1]);
 
-
 		if (output_p_c_sort_param == 'abc') {
 
 			var dim_index = i;
 
 		} else if (output_p_c_sort_param == 'grouped') {
 
-			dim_index = sorted_dims[dk]
+			var dim_index = sorted_dims[dk]
+
+		} else if (output_p_c_sort_param == undefined) {
+			// Take previous index if sort param has been reset
+			var dim_index = pc_plot_objs.output.dimensions()[dk].index
+
+		} else {
+			// default ... by order of data
+			var dim_index = i
 		}
+
+		// Reset so that user's axis movements can be retained
+		
+		
 
 
 		var title = _.chain(outpt_keys)
@@ -945,6 +965,7 @@ function gen_p_coord_plot_proto(output){
 					index: dim_index
 				}
 	})
+
 
 
 	
@@ -974,6 +995,16 @@ function gen_p_coord_plot_proto(output){
 	pc_out.reorderable();
 
 
+	console.log('output dimensions', pc_out.dimensions())
+
+	// For dealing with user sorted axis order
+
+	// store current instance of plot
+	pc_plot_objs.output = pc_out;
+
+	// reset sort param so that user ordering sticks
+	output_p_c_sort_param = undefined;
+
 	d3.select('#parcoord_plot').selectAll('.label').each(function(){
 		var key_label = d3.select(this).text();
 
@@ -982,7 +1013,7 @@ function gen_p_coord_plot_proto(output){
 					.get('[0]desc')
 					.value()
 
-
+	
 
 	})
 
