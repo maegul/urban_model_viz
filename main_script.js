@@ -20,6 +20,8 @@ d3.queue()
 function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
+
+
 // Sort Data
 
 	// Take out constants into separate object
@@ -445,7 +447,20 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	// Add sorting buttons
 
 	//  Determines how output axes sorted
-	// Note ... can be reset to undefined to allow for user ordering to persist
+	// Usage is a bit convoluted.
+	// See also update() and gen_p_coord_plot_proto() and sort button event listener below
+
+
+	// Default here is alphabetically ('abc')
+	// After gen_p_coord_plot_proto() has finished, it is assigned as undefined
+	// This tells future iterations of gen_p_coord_plot_proto() to retain previous axis arrangement
+	// Which allows the user to move axes around, and change values
+
+	// When a sort param button is clicked, the value changes, and gen_p_coord_plot_proto() sorts accordingly
+	// if it is changed to "Current Selection Grouped", then update() recalculates the order for
+	// the current output, and which gen_p_coord_plot_proto() is programmed to look at
+
+
 	var output_p_c_sort_param = 'abc'
 
 
@@ -468,7 +483,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 				// If user ordering has occurred ... re apply irrespective of whether selected or not
 				output_p_c_sort_param = d3.select(this).attr('sort_param');
-				
+
 
 
 				update();
@@ -504,6 +519,13 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
 	// Download CSVs
+
+	// For downloading files - to add date_time to file name
+	time_pl_form = d3.time.format('%Y-%m-%d_%H-%M-%S');
+
+	function gen_date_time(tm){
+		return time_pl_form(new Date);
+	}
 
 	function gen_input_data_csv_array(){
 
@@ -554,10 +576,12 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 		var csvContent = csv_arrays.map(oa => oa.join(',')).join('\n')
 
+		var date_time = '_'+gen_date_time();
+
 		var a = document.createElement('a');
 		a.href = 'data:attachment/csv,' +  encodeURIComponent(csvContent);
 		a.target = '_blank';
-		a.download = file_name+'.csv';
+		a.download = file_name+date_time+'.csv';
 
 		document.body.appendChild(a);
 		a.click();
@@ -597,6 +621,7 @@ function update(return_data){
 
 	if (output_p_c_sort_param == 'current selection grouped') {
 		current_sorted_dims = gen_sorted_dims(output)
+
 	}
 	// Store base sorted dims, then have modified version and modify and toggle back 
 	// when necessary
@@ -951,6 +976,8 @@ function gen_p_coord_plot_proto(output){
 
 		var scale = d3.scale.linear().domain(extent).range([range, 1]);
 
+		console.trace()
+		console.log('pcoord output, sort_param', output_p_c_sort_param)
 		if (output_p_c_sort_param == 'abc') {
 
 			var dim_index = i;
