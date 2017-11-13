@@ -20,6 +20,8 @@ d3.queue()
 function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
+
+
 // Sort Data
 
 	// Take out constants into separate object
@@ -176,6 +178,11 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	var sel_group = 'User';
 
 	var group_input_dat = get_group_input_dat();
+
+	var pc_plot_objs = {
+		output: undefined,
+		input: undefined
+	}
 
 	function get_group_input_dat(){
 		if (sel_group == 'User') {
@@ -391,40 +398,48 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 	// Sort Axes Numerically
 
+	var sorted_dims = gen_sorted_dims(base_output);
+
+	function gen_sorted_dims(output){
 
 
-	var dim_val_order = [];
+		var dim_val_order = [];
 
-	dims_keys_output.forEach(function(dk){
+		dims_keys_output.forEach(function(dk){
 
-		var out_name_val = _.chain(base_output)
-			.sortBy(o => o[dk])
-			.map(o => o.name)
-			.reverse() // First element is highest in value
-			.value();
+		// Change base_output to current output to sort by current selection??
+			var out_name_val = _.chain(output)
+				.sortBy(o => o[dk])
+				.map(o => o.name)
+				.reverse() // First element is highest in value
+				.value();
 
-		dim_val_order.push({dim: dk, ord: out_name_val})
-
-
-	})
+			dim_val_order.push({dim: dk, ord: out_name_val})
 
 
-	console.log('dim order', dim_val_order)
+		})
 
-	var dim_sort_key = d3.range(dim_val_order[0]['ord'].length).map(function(idx){
-									return '[ord][' + idx + ']'
-								})
 
-	var sorted_dims = _.chain(dim_val_order)
-						.sortBy(dim_sort_key)
-						.map(function(d, i){
-							return {dim: d.dim, index: i}
-						})
-						.value();
+		console.log('dim order', dim_val_order)
 
-	sorted_dims = _.zipObject(_.map(sorted_dims, 'dim'), _.map(sorted_dims, 'index'))
+		var dim_sort_key = d3.range(dim_val_order[0]['ord'].length).map(function(idx){
+										return '[ord][' + idx + ']'
+									})
 
-	console.log('sorted dims', sorted_dims)
+		var sorted_dims = _.chain(dim_val_order)
+							.sortBy(dim_sort_key)
+							.map(function(d, i){
+								return {dim: d.dim, index: i}
+							})
+							.value();
+
+		sorted_dims = _.zipObject(_.map(sorted_dims, 'dim'), _.map(sorted_dims, 'index'))
+
+		console.log('sorted dims', sorted_dims)
+
+		return sorted_dims;
+	}
+
 
 
 
@@ -432,6 +447,20 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	// Add sorting buttons
 
 	//  Determines how output axes sorted
+	// Usage is a bit convoluted.
+	// See also update() and gen_p_coord_plot_proto() and sort button event listener below
+
+
+	// Default here is alphabetically ('abc')
+	// After gen_p_coord_plot_proto() has finished, it is assigned as undefined
+	// This tells future iterations of gen_p_coord_plot_proto() to retain previous axis arrangement
+	// Which allows the user to move axes around, and change values
+
+	// When a sort param button is clicked, the value changes, and gen_p_coord_plot_proto() sorts accordingly
+	// if it is changed to "Current Selection Grouped", then update() recalculates the order for
+	// the current output, and which gen_p_coord_plot_proto() is programmed to look at
+
+
 	var output_p_c_sort_param = 'abc'
 
 
@@ -439,7 +468,7 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 	sort_inpts.append('div').text('Sort output by:')
 	var sort_sel_cont = sort_inpts.append('div');
 
-	var sort_opts = ['ABC', 'Grouped']
+	var sort_opts = ['ABC', 'Grouped', 'Current Selection Grouped']
 
 	sort_opts.forEach(function(l){
 		sort_sel_cont.append('button').classed('sel_butt', true)
@@ -452,6 +481,13 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 				var sel = d3.select(this).attr('sel')
 
+				// If user ordering has occurred ... re apply irrespective of whether selected or not
+				output_p_c_sort_param = d3.select(this).attr('sort_param');
+
+
+
+				update();
+
 				if (sel == 0) {
 
 					d3.select(this.parentNode).selectAll('button')
@@ -463,8 +499,6 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 						.style('opacity', 1)
 
 
-					output_p_c_sort_param = d3.select(this).attr('sort_param');
-					update();
 
 				}
 			})
@@ -485,6 +519,13 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 
 	// Download CSVs
+
+	// For downloading files - to add date_time to file name
+	time_pl_form = d3.time.format('%Y-%m-%d_%H-%M-%S');
+
+	function gen_date_time(tm){
+		return time_pl_form(new Date);
+	}
 
 	function gen_input_data_csv_array(){
 
@@ -535,10 +576,12 @@ function ready(error, data, inputs, inpt_keys, outpt_keys){
 
 		var csvContent = csv_arrays.map(oa => oa.join(',')).join('\n')
 
+		var date_time = '_'+gen_date_time();
+
 		var a = document.createElement('a');
 		a.href = 'data:attachment/csv,' +  encodeURIComponent(csvContent);
 		a.target = '_blank';
-		a.download = file_name+'.csv';
+		a.download = file_name+date_time+'.csv';
 
 		document.body.appendChild(a);
 		a.click();
@@ -575,6 +618,15 @@ function update(return_data){
 
 
 	var output = gen_output_proto(new_input);
+
+	if (output_p_c_sort_param == 'current selection grouped') {
+		current_sorted_dims = gen_sorted_dims(output)
+
+	}
+	// Store base sorted dims, then have modified version and modify and toggle back 
+	// when necessary
+
+
 	gen_p_coord_plot_proto(output);
 
 	var input_dat = gen_input_dat(new_input);
@@ -924,15 +976,32 @@ function gen_p_coord_plot_proto(output){
 
 		var scale = d3.scale.linear().domain(extent).range([range, 1]);
 
-
+		console.trace()
+		console.log('pcoord output, sort_param', output_p_c_sort_param)
 		if (output_p_c_sort_param == 'abc') {
 
 			var dim_index = i;
 
 		} else if (output_p_c_sort_param == 'grouped') {
 
-			dim_index = sorted_dims[dk]
+			var dim_index = sorted_dims[dk]
+
+		} else if (output_p_c_sort_param == 'current selection grouped') {
+
+			var dim_index = current_sorted_dims[dk]
+
+		} else if (output_p_c_sort_param == undefined) {
+			// Take previous index if sort param has been reset
+			var dim_index = pc_plot_objs.output.dimensions()[dk].index
+
+		} else {
+			// default ... by order of data
+			var dim_index = i
 		}
+
+		// Reset so that user's axis movements can be retained
+		
+		
 
 
 		var title = _.chain(outpt_keys)
@@ -945,6 +1014,7 @@ function gen_p_coord_plot_proto(output){
 					index: dim_index
 				}
 	})
+
 
 
 	
@@ -974,6 +1044,16 @@ function gen_p_coord_plot_proto(output){
 	pc_out.reorderable();
 
 
+	console.log('output dimensions', pc_out.dimensions())
+
+	// For dealing with user sorted axis order
+
+	// store current instance of plot
+	pc_plot_objs.output = pc_out;
+
+	// reset sort param so that user ordering sticks
+	output_p_c_sort_param = undefined;
+
 	d3.select('#parcoord_plot').selectAll('.label').each(function(){
 		var key_label = d3.select(this).text();
 
@@ -982,7 +1062,7 @@ function gen_p_coord_plot_proto(output){
 					.get('[0]desc')
 					.value()
 
-
+	
 
 	})
 
